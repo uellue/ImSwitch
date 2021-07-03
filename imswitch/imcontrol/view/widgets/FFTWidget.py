@@ -38,13 +38,13 @@ class FFTWidget(guitools.NapariBaseWidget):
             """ Show or hide FFT. """
             #if enabled: self.imageComputationThread.start()
             if enabled:
-                image = self.viewer.layers['Camera'].data
-                fft = np.fft.fftshift(np.log10(abs(np.fft.fft2(image))))
-                self.viewer.add_image(fft)
+                if not 'fft' in self.viewer.layers:
+                    image = next(iter(self.viewer.layers.selection)).data
+                    fft = np.fft.fftshift(np.log10(abs(np.fft.fft2(image))))
+                    self.viewer.add_image(fft)
                 self.imageComputationThread.start()
             else:
-                self.imageComputationThread.stop()
-
+                self.imageComputationThread.exit()
 
     class FFTImageComputationWorker(Worker):
 
