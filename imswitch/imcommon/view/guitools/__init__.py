@@ -4,7 +4,7 @@ from .colorutils import wavelengthToHex
 from .dialogtools import askYesNoQuestion, askForFilePath, askForFolderPath, askForTextInput
 from .imagetools import bestLevels, minmaxLevels
 from .naparitools import (
-    addNapariGrayclipColormap, NapariUpdateLevelsWidget, NapariShiftWidget, VispyROIVisual,
+    addNapariGrayclipColormap, NapariBaseWidget, NapariUpdateLevelsWidget, NapariShiftWidget, VispyROIVisual,
     VispyLineVisual, VispyGridVisual, VispyCrosshairVisual, VispyScatterVisual
 )
 from .OptimizedImageItem import OptimizedImageItem
