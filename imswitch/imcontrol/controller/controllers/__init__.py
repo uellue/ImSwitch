@@ -13,5 +13,4 @@ from .RecordingController import RecordingController
 from .ScanController import ScanController
 from .SettingsController import SettingsController
 from .SLMController import SLMController
-from .ULensesController import ULensesController
 from .ViewController import ViewController

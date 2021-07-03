@@ -33,9 +33,10 @@ class ImConMainController(MainController):
         self.controllers = {}
 
         for widgetKey, widget in self.__mainView.widgets.items():
-            self.controllers[widgetKey] = self.__factory.createController(
-                getattr(controllers, f'{widgetKey}Controller'), widget
-            )
+            if not isinstance(widget, guitools.NapariBaseWidget):
+                self.controllers[widgetKey] = self.__factory.createController(
+                    getattr(controllers, f'{widgetKey}Controller'), widget
+                )
 
         # Generate API
         self.__api = None

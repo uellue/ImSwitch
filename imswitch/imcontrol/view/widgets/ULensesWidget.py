@@ -8,21 +8,18 @@ from .basewidgets import Widget
 class ULensesWidget(guitools.NapariBaseWidget):
     """ Alignment widget that shows a grid of points on top of the image in the viewbox."""
 
-    sigULensesClicked = QtCore.Signal()
-    sigUShowLensesChanged = QtCore.Signal(bool)  # (enabled)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Graphical Elements
         self.ulensesButton = guitools.BetterPushButton('uLenses')
-        self.ulensesCheck = QtWidgets.QCheckBox('Show uLenses')
         self.xEdit = QtWidgets.QLineEdit('0')
         self.yEdit = QtWidgets.QLineEdit('0')
         self.pxEdit = QtWidgets.QLineEdit('157.5')
         self.upEdit = QtWidgets.QLineEdit('1182')
-        self.ulensesPlot = guitools.VispyScatterVisual(color='red', symbol='x')
 
+        self.init = False
+        self.layer = []
         # Add elements to GridLayout
         ulensesLayout = QtWidgets.QGridLayout()
         self.setLayout(ulensesLayout)
@@ -35,11 +32,9 @@ class ULensesWidget(guitools.NapariBaseWidget):
         ulensesLayout.addWidget(QtWidgets.QLabel('Y offset'), 3, 0)
         ulensesLayout.addWidget(self.yEdit, 3, 1)
         ulensesLayout.addWidget(self.ulensesButton, 4, 0)
-        ulensesLayout.addWidget(self.ulensesCheck, 4, 1)
 
         # Connect signals
-        self.ulensesButton.clicked.connect(self.sigULensesClicked)
-        self.ulensesCheck.toggled.connect(self.sigUShowLensesChanged)
+        self.ulensesButton.clicked.connect(self.toggleULenses)
 
     def getParameters(self):
         """ Returns the X offset, Y offset, pixel size, and periodicity
@@ -49,16 +44,22 @@ class ULensesWidget(guitools.NapariBaseWidget):
                 np.float(self.pxEdit.text()),
                 np.float(self.upEdit.text()))
 
-    def getPlotGraphicsItem(self):
-        return self.ulensesPlot
+    def toggleULenses(self, show):
+        """ Shows or hides grid. """
+        x, y, px, up = self.getParameters()
+        size_x, size_y = self.viewer.layers[0].data.shape
+        pattern_x = np.arange(x, size_x, up / px)
+        pattern_y = np.arange(y, size_y, up / px)
+        grid = np.array(np.meshgrid(pattern_x, pattern_y)).T.reshape(-1, 2)
 
-    def setData(self, x, y):
-        """ Updates plot with new parameters. """
-        self.ulensesPlot.setData(x=x, y=y)
-
-    def setULensesVisible(self, visible):
-        """ Updates visibility of plot. """
-        self.ulensesPlot.setVisible(visible)
+        if self.init:
+            if 'grid' in self.viewer.layers:
+                self.layer.data = grid
+            else:
+                self.layer = self.viewer.add_points(grid, size=2, face_color='red', symbol='ring')
+        else:
+            self.layer = self.viewer.add_points(grid, size=2, face_color='red', symbol='ring')
+            self.init = True
 
 
 # Copyright (C) 2020, 2021 TestaLab
